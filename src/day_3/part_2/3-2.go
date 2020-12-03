@@ -39,4 +39,5 @@ func main() {
 	treesEncountered *= findTrees(treeMap, 1, 2)
 
 	fmt.Println(treesEncountered)
+	q := new(Q)
 }
