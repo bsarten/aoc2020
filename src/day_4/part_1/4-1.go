@@ -1,9 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"strings"
 )
 
@@ -50,27 +49,24 @@ func validatePassport(fields *map[string]string) bool {
 }
 
 func main() {
-	file, _ := os.Open("../input.txt")
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
+	b, _ := ioutil.ReadFile("../input.txt")
 	validPassports := 0
-	fields := make(map[string]string)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "" {
-			if validatePassport(&fields) {
-				validPassports++
+	for _, passport := range strings.Split(string(b), "\n\n") {
+		passport := strings.ReplaceAll(passport, "\n", " ")
+		fields := make(map[string]string)
+		for _, field := range strings.Split(passport, " ") {
+			nv := strings.Split(field, ":")
+			if len(nv) == 2 {
+				name := nv[0]
+				value := nv[1]
+				fields[name] = value
 			}
-			fields = make(map[string]string)
-			continue
 		}
 
-		for _, field := range strings.Split(line, " ") {
-			nv := strings.Split(field, ":")
-			name := nv[0]
-			value := nv[1]
-			fields[name] = value
+		if validatePassport(&fields) {
+			validPassports++
 		}
 	}
+
 	fmt.Println(validPassports)
 }
