@@ -18,7 +18,7 @@ func validateIyr(fields *map[string]string) bool {
 }
 
 func validateEyr(fields *map[string]string) bool {
-	_, valid := (*fields)["byr"]
+	_, valid := (*fields)["eyr"]
 	return valid
 }
 
