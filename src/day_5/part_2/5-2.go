@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	mapset "github.com/deckarep/golang-set"
 )
 
 func translateToBinary(r rune) rune {
@@ -21,25 +23,21 @@ func main() {
 	file, _ := os.Open("../input.txt")
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
-	nottakenmap := make(map[int]int)
+	allSeats := mapset.NewSet()
 	for i := 0; i < 1023; i++ {
-		nottakenmap[i] = 0
+		allSeats.Add(i)
 	}
-	takenmap := make(map[int]int)
+	seatsTaken := mapset.NewSet()
 	for scanner.Scan() {
 		binaryStr := strings.Map(translateToBinary, scanner.Text())
 		seatID, _ := strconv.ParseInt(binaryStr, 2, 64)
-		takenmap[int(seatID)] = 0
-		delete(nottakenmap, int(seatID))
+		seatsTaken.Add(int(seatID))
 	}
 
-	for seat := range nottakenmap {
-		_, ok := takenmap[seat-1]
-		if ok {
-			_, ok := takenmap[seat+1]
-			if ok {
-				fmt.Println(seat)
-			}
+	seatsNotTaken := allSeats.Difference(seatsTaken)
+	for seat := range seatsNotTaken.Iter() {
+		if seatsTaken.Contains(seat.(int)-1) && seatsTaken.Contains(seat.(int)+1) {
+			fmt.Println(seat)
 		}
 	}
 }
