@@ -21,12 +21,12 @@ func main() {
 	file, _ := os.Open("../input.txt")
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
-	var highestSeatID int64 = 0
+	highestSeatID := 0
 	for scanner.Scan() {
 		binaryStr := strings.Map(translateToBinary, scanner.Text())
 		seatID, _ := strconv.ParseInt(binaryStr, 2, 64)
-		if seatID > highestSeatID {
-			highestSeatID = seatID
+		if int(seatID) > highestSeatID {
+			highestSeatID = int(seatID)
 		}
 	}
 
