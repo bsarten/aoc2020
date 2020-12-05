@@ -27,9 +27,9 @@ func main() {
 	scanner.Split(bufio.ScanLines)
 	highestSeatID := 0
 	for scanner.Scan() {
-		pass := scanner.Text()
-		rowstr := pass[0:7]
-		seatstr := pass[7:]
+		line := scanner.Text()
+		rowstr := line[0:7]
+		seatstr := line[7:]
 
 		seat := binsearch(seatstr)
 		row := binsearch(rowstr)
