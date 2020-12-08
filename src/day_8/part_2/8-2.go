@@ -12,11 +12,8 @@ type instruction struct {
 	argument  int
 }
 
-var accumulator int = 0
-var instructions []instruction
-
-func loadProgram(filename string) {
-	instructions = make([]instruction, 0)
+func loadProgram(filename string) *[]instruction {
+	instructions := make([]instruction, 0)
 	b, _ := ioutil.ReadFile(filename)
 	for _, instructionStr := range strings.Split(string(b), "\n") {
 		if instructionStr == "" {
@@ -26,16 +23,18 @@ func loadProgram(filename string) {
 		operator, _ := strconv.Atoi(string(ins[1]))
 		instructions = append(instructions, instruction{string(ins[0]), operator})
 	}
+	return &instructions
 }
 
-func runProgram() bool {
+func runProgram(instructions *[]instruction) (bool, int) {
 	iPtr := 0
-	executed := make(map[int]struct{}, len(instructions))
+	accumulator := 0
+	executed := make(map[int]struct{}, len(*instructions))
 	for {
-		ins := &instructions[iPtr]
+		ins := (*instructions)[iPtr]
 
 		if _, ok := executed[iPtr]; ok {
-			return false
+			return false, accumulator
 		}
 		executed[iPtr] = struct{}{}
 
@@ -48,20 +47,16 @@ func runProgram() bool {
 		case "jmp":
 			iPtr += ins.argument
 		}
-		if iPtr > len(instructions)-1 {
-			return true
+		if iPtr > len(*instructions)-1 {
+			return true, accumulator
 		}
 	}
 }
 
-func resetProgram() {
-	accumulator = 0
-}
-
 func main() {
-	loadProgram("../input.txt")
-	for i := 0; i < len(instructions); i++ {
-		ins := &instructions[i]
+	instructions := loadProgram("../input.txt")
+	for idx := range *instructions {
+		ins := &(*instructions)[idx]
 
 		switch ins.operation {
 		case "jmp":
@@ -72,7 +67,7 @@ func main() {
 			continue
 		}
 
-		if runProgram() {
+		if ok, accumulator := runProgram(instructions); ok {
 			fmt.Println(accumulator)
 			return
 		}
@@ -83,7 +78,5 @@ func main() {
 		case "nop":
 			ins.operation = "jmp"
 		}
-
-		resetProgram()
 	}
 }
