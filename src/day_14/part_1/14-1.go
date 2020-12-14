@@ -44,15 +44,13 @@ func runProgram(program []instruction, memory map[string]uint64) {
 	for _, instruction := range program {
 		switch instruction.instructionType {
 		case maskInstruction:
-			var temp uint64
-			temp, _ = strconv.ParseUint(strings.ReplaceAll(instruction.value, "X", "1"), 2, 64)
-			maskZero = 0xFFFFFFF000000000 | temp
-			temp, _ = strconv.ParseUint(strings.ReplaceAll(instruction.value, "X", "0"), 2, 64)
-			maskOne = temp
+			maskZero, _ = strconv.ParseUint(strings.ReplaceAll(instruction.value, "X", "1"), 2, 64)
+			maskZero = 0xFFFFFFF000000000 | maskZero
+			maskOne, _ = strconv.ParseUint(strings.ReplaceAll(instruction.value, "X", "0"), 2, 64)
 		case memInstruction:
-			var temp int
-			temp, _ = strconv.Atoi(instruction.value)
-			memory[instruction.location] = (uint64(temp) | maskOne) & maskZero
+			var value uint64
+			value, _ = strconv.ParseUint(instruction.value, 64, 64)
+			memory[instruction.location] = (uint64(value) | maskOne) & maskZero
 		}
 	}
 }
