@@ -13,7 +13,7 @@ const maskInstruction = 1
 
 type instruction struct {
 	instructionType int
-	location        int
+	location        string
 	value           string
 }
 
@@ -29,17 +29,16 @@ func readProgram(filename string) []instruction {
 		re := regexp.MustCompile(`^mem\[(\d+)\]$`)
 		match := re.FindStringSubmatch(eqsplit[0])
 		if len(match) == 2 {
-			location, _ := strconv.Atoi(match[1])
-			instructions = append(instructions, instruction{memInstruction, location, eqsplit[1]})
+			instructions = append(instructions, instruction{memInstruction, match[1], eqsplit[1]})
 		} else {
-			instructions = append(instructions, instruction{maskInstruction, 0, eqsplit[1]})
+			instructions = append(instructions, instruction{maskInstruction, "", eqsplit[1]})
 		}
 	}
 
 	return instructions
 }
 
-func runProgram(program []instruction, memory map[int]uint64) {
+func runProgram(program []instruction, memory map[string]uint64) {
 	var maskZero uint64 = 0
 	var maskOne uint64 = 0
 	for _, instruction := range program {
@@ -60,7 +59,7 @@ func runProgram(program []instruction, memory map[int]uint64) {
 
 func main() {
 	program := readProgram("../input.txt")
-	memory := make(map[int]uint64, 0)
+	memory := make(map[string]uint64, 0)
 	runProgram(program, memory)
 	var sum uint64 = 0
 	for _, v := range memory {
