@@ -48,9 +48,9 @@ func runProgram(program []instruction, memory map[string]uint64) {
 			maskZero = 0xFFFFFFF000000000 | maskZero
 			maskOne, _ = strconv.ParseUint(strings.ReplaceAll(instruction.value, "X", "0"), 2, 64)
 		case memInstruction:
-			var value uint64
-			value, _ = strconv.ParseUint(instruction.value, 64, 64)
-			memory[instruction.location] = (uint64(value) | maskOne) & maskZero
+			var temp int
+			temp, _ = strconv.Atoi(instruction.value)
+			memory[instruction.location] = (uint64(temp) | maskOne) & maskZero
 		}
 	}
 }
