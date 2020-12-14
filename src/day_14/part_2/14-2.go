@@ -45,9 +45,7 @@ func setMem(memory map[string]uint64, location []byte, value string, mask string
 		}
 		switch mask[maskPosition] {
 		case '1':
-			fmt.Println(string(location))
 			location[maskPosition] = '1'
-			fmt.Println(string(location))
 		case 'X':
 			location[maskPosition] = '0'
 			setMem(memory, location, value, mask, maskPosition+1)
