@@ -8,13 +8,17 @@ import (
 	"strings"
 )
 
-const memInstruction = 0
-const maskInstruction = 1
+type instructionType int
+
+const (
+	memInstruction instructionType = iota
+	maskInstruction
+)
 
 type instruction struct {
-	instructionType int
-	location        string
-	value           string
+	t        instructionType
+	location string
+	value    string
 }
 
 func readProgram(filename string) []instruction {
@@ -61,7 +65,7 @@ func setMem(memory map[string]uint64, location []byte, value string, mask string
 func runProgram(program []instruction, memory map[string]uint64) {
 	var mask string = ""
 	for _, instruction := range program {
-		switch instruction.instructionType {
+		switch instruction.t {
 		case maskInstruction:
 			mask = instruction.value
 		case memInstruction:
