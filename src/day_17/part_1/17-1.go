@@ -36,8 +36,9 @@ type Empty struct {
 }
 
 type Nodes struct {
-	dims  Dimensions
-	nodes map[Coordinates]Empty
+	dims      Dimensions
+	dimsValid bool
+	nodes     map[Coordinates]Empty
 }
 
 func (n *Nodes) exists(coords Coordinates) bool {
@@ -52,12 +53,18 @@ func newNodes() *Nodes {
 
 func (n *Nodes) addNode(coords Coordinates) {
 	n.nodes[coords] = Empty{}
-	n.dims.min.x = minInt(coords.x, n.dims.min.x)
-	n.dims.min.y = minInt(coords.y, n.dims.min.y)
-	n.dims.min.z = minInt(coords.z, n.dims.min.z)
-	n.dims.max.x = maxInt(coords.x, n.dims.max.x)
-	n.dims.max.y = maxInt(coords.y, n.dims.max.y)
-	n.dims.max.z = maxInt(coords.z, n.dims.max.z)
+	if n.dimsValid {
+		n.dims.min.x = minInt(coords.x, n.dims.min.x)
+		n.dims.min.y = minInt(coords.y, n.dims.min.y)
+		n.dims.min.z = minInt(coords.z, n.dims.min.z)
+		n.dims.max.x = maxInt(coords.x, n.dims.max.x)
+		n.dims.max.y = maxInt(coords.y, n.dims.max.y)
+		n.dims.max.z = maxInt(coords.z, n.dims.max.z)
+	} else {
+		n.dims.min = coords
+		n.dims.max = coords
+		n.dimsValid = true
+	}
 }
 
 func (n *Nodes) countActiveNeighborsAt(coords Coordinates) int {
@@ -103,6 +110,23 @@ func simulateCycle(nodes *Nodes) *Nodes {
 	}
 
 	return newNodes
+}
+
+func printNodes(nodes *Nodes) {
+	for z := nodes.dims.min.z; z <= nodes.dims.max.z; z++ {
+		fmt.Println()
+		fmt.Println(fmt.Sprintf("z = %d", z))
+		for y := nodes.dims.min.y; y <= nodes.dims.max.y; y++ {
+			for x := nodes.dims.min.x; x <= nodes.dims.max.x; x++ {
+				if nodes.exists(Coordinates{x, y, z}) {
+					fmt.Print("#")
+				} else {
+					fmt.Print(".")
+				}
+			}
+			fmt.Println()
+		}
+	}
 }
 
 func main() {

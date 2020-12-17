@@ -37,8 +37,9 @@ type Empty struct {
 }
 
 type Nodes struct {
-	dims  Dimensions
-	nodes map[Coordinates]Empty
+	dims      Dimensions
+	dimsValid bool
+	nodes     map[Coordinates]Empty
 }
 
 func newNodes() *Nodes {
@@ -53,14 +54,20 @@ func (n *Nodes) exists(coords Coordinates) bool {
 
 func (n *Nodes) addNode(coords Coordinates) {
 	n.nodes[coords] = Empty{}
-	n.dims.min.x = minInt(coords.x, n.dims.min.x)
-	n.dims.min.y = minInt(coords.y, n.dims.min.y)
-	n.dims.min.z = minInt(coords.z, n.dims.min.z)
-	n.dims.min.w = minInt(coords.z, n.dims.min.w)
-	n.dims.max.x = maxInt(coords.x, n.dims.max.x)
-	n.dims.max.y = maxInt(coords.y, n.dims.max.y)
-	n.dims.max.z = maxInt(coords.z, n.dims.max.z)
-	n.dims.max.w = maxInt(coords.z, n.dims.max.w)
+	if n.dimsValid {
+		n.dims.min.x = minInt(coords.x, n.dims.min.x)
+		n.dims.min.y = minInt(coords.y, n.dims.min.y)
+		n.dims.min.z = minInt(coords.z, n.dims.min.z)
+		n.dims.min.w = minInt(coords.z, n.dims.min.w)
+		n.dims.max.x = maxInt(coords.x, n.dims.max.x)
+		n.dims.max.y = maxInt(coords.y, n.dims.max.y)
+		n.dims.max.z = maxInt(coords.z, n.dims.max.z)
+		n.dims.max.w = maxInt(coords.z, n.dims.max.w)
+	} else {
+		n.dims.min = coords
+		n.dims.max = coords
+		n.dimsValid = true
+	}
 }
 
 func (n *Nodes) countActiveNeighborsAt(coords Coordinates) int {
