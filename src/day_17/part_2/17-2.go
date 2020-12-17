@@ -125,9 +125,7 @@ func main() {
 			continue
 		}
 		for nodeIdx, node := range line {
-			xCoord := nodeIdx - len(line)/2
-			yCoord := lineIdx - len(lines)/2
-			addNode(nodes, &dims, xCoord, yCoord, 0, 0, node)
+			addNode(nodes, &dims, nodeIdx, lineIdx, 0, 0, node)
 		}
 	}
 
