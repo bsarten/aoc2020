@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strings"
 )
 
@@ -105,8 +106,13 @@ func maxInt(n1 int, n2 int) int {
 }
 
 func main() {
+	const numCycles = 6
+	b, err := ioutil.ReadFile("../input.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	nodes := newNodes()
-	b, _ := ioutil.ReadFile("../input.txt")
 	lines := strings.Split(string(b), "\n")
 	for lineIdx, line := range lines {
 		if line == "" {
@@ -119,7 +125,7 @@ func main() {
 		}
 	}
 
-	for i := 0; i < 6; i++ {
+	for i := 0; i < numCycles; i++ {
 		nodes = simulateCycle(nodes)
 	}
 
