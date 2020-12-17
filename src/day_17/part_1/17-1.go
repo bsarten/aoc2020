@@ -7,6 +7,20 @@ import (
 	"strings"
 )
 
+func minInt(n1 int, n2 int) int {
+	if n1 < n2 {
+		return n1
+	}
+	return n2
+}
+
+func maxInt(n1 int, n2 int) int {
+	if n1 > n2 {
+		return n1
+	}
+	return n2
+}
+
 type Dimensions struct {
 	min Coordinates
 	max Coordinates
@@ -46,7 +60,7 @@ func (n *Nodes) addNode(coords Coordinates) {
 	n.dims.max.z = maxInt(coords.z, n.dims.max.z)
 }
 
-func countActiveNeighbors(nodes *Nodes, coords Coordinates) int {
+func (n *Nodes) countActiveNeighborsAt(coords Coordinates) int {
 	count := 0
 	var checkCoords Coordinates
 	for checkCoords.x = coords.x - 1; checkCoords.x <= coords.x+1; checkCoords.x++ {
@@ -55,7 +69,7 @@ func countActiveNeighbors(nodes *Nodes, coords Coordinates) int {
 				if checkCoords.x == coords.x && checkCoords.y == coords.y && checkCoords.z == coords.z {
 					continue
 				}
-				if nodes.exists(checkCoords) {
+				if n.exists(checkCoords) {
 					count++
 				}
 			}
@@ -72,7 +86,7 @@ func simulateCycle(nodes *Nodes) *Nodes {
 	for coords.x = nodes.dims.min.x - 1; coords.x <= nodes.dims.max.x+1; coords.x++ {
 		for coords.y = nodes.dims.min.y - 1; coords.y <= nodes.dims.max.y+1; coords.y++ {
 			for coords.z = nodes.dims.min.z - 1; coords.z <= nodes.dims.max.z+1; coords.z++ {
-				activeNeighbors := countActiveNeighbors(nodes, coords)
+				activeNeighbors := nodes.countActiveNeighborsAt(coords)
 				if nodes.exists(coords) {
 					// active
 					if activeNeighbors == 2 || activeNeighbors == 3 {
@@ -89,20 +103,6 @@ func simulateCycle(nodes *Nodes) *Nodes {
 	}
 
 	return newNodes
-}
-
-func minInt(n1 int, n2 int) int {
-	if n1 < n2 {
-		return n1
-	}
-	return n2
-}
-
-func maxInt(n1 int, n2 int) int {
-	if n1 > n2 {
-		return n1
-	}
-	return n2
 }
 
 func main() {
