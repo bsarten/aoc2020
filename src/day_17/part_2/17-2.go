@@ -97,24 +97,6 @@ func addNode(nodes map[string]rune, dims *Dimensions, x int, y int, z int, w int
 	dims.maxW = maxInt(w, dims.maxW)
 }
 
-func printNodes(nodes map[string]rune, dims Dimensions) {
-	for z := dims.minZ; z <= dims.maxZ; z++ {
-		fmt.Println()
-		fmt.Println(fmt.Sprintf("z = %d", z))
-		for y := dims.minY; y <= dims.maxY; y++ {
-			for x := dims.minX; x <= dims.maxX; x++ {
-				node, exists := nodes[fmt.Sprintf("%d,%d,%d", x, y, z)]
-				if exists {
-					fmt.Print(string(node))
-				} else {
-					fmt.Print(".")
-				}
-			}
-			fmt.Println()
-		}
-	}
-}
-
 func main() {
 	dims := Dimensions{0, 0, 0, 0, 0, 0, 0, 0}
 	nodes := make(map[string]rune, 0)
