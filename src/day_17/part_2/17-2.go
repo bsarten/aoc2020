@@ -7,30 +7,60 @@ import (
 )
 
 type Dimensions struct {
-	minX int
-	minY int
-	minZ int
-	maxX int
-	maxY int
-	maxZ int
-	minW int
-	maxW int
+	min Coordinates
+	max Coordinates
 }
 
-func countActiveNeighbors(nodes map[string]struct{}, x int, y int, z int, w int) int {
+type Coordinates struct {
+	x int
+	y int
+	z int
+	w int
+}
+
+type Empty struct {
+}
+
+type Nodes struct {
+	dims  Dimensions
+	nodes map[Coordinates]Empty
+}
+
+func (n *Nodes) exists(coords Coordinates) bool {
+	_, exists := n.nodes[coords]
+	return exists
+}
+
+func newNodes() *Nodes {
+	n := Nodes{Dimensions{Coordinates{0, 0, 0, 0}, Coordinates{0, 0, 0, 0}}, make(map[Coordinates]Empty, 0)}
+	return &n
+}
+
+func (n *Nodes) addNode(coords Coordinates) {
+	n.nodes[coords] = Empty{}
+	n.dims.min.x = minInt(coords.x, n.dims.min.x)
+	n.dims.min.y = minInt(coords.y, n.dims.min.y)
+	n.dims.min.z = minInt(coords.z, n.dims.min.z)
+	n.dims.min.w = minInt(coords.z, n.dims.min.w)
+	n.dims.max.x = maxInt(coords.x, n.dims.max.x)
+	n.dims.max.y = maxInt(coords.y, n.dims.max.y)
+	n.dims.max.z = maxInt(coords.z, n.dims.max.z)
+	n.dims.max.w = maxInt(coords.z, n.dims.max.w)
+}
+
+func countActiveNeighbors(nodes *Nodes, coords Coordinates) int {
 	count := 0
-	for ix := x - 1; ix <= x+1; ix++ {
-		for iy := y - 1; iy <= y+1; iy++ {
-			for iz := z - 1; iz <= z+1; iz++ {
-				for iw := w - 1; iw <= w+1; iw++ {
-					if ix == x && iy == y && iz == z && iw == w {
+	var checkCoords Coordinates
+	for checkCoords.x = coords.x - 1; checkCoords.x <= coords.x+1; checkCoords.x++ {
+		for checkCoords.y = coords.y - 1; checkCoords.y <= coords.y+1; checkCoords.y++ {
+			for checkCoords.z = coords.z - 1; checkCoords.z <= coords.z+1; checkCoords.z++ {
+				for checkCoords.w = coords.w - 1; checkCoords.w <= coords.w+1; checkCoords.w++ {
+					if checkCoords.x == coords.x && checkCoords.y == coords.y && checkCoords.z == coords.z && checkCoords.w == coords.w {
 						continue
 					}
-					nodestr := fmt.Sprintf("%d,%d,%d,%d", ix, iy, iz, iw)
-					if _, exists := nodes[nodestr]; exists {
+					if nodes.exists(checkCoords) {
 						count++
 					}
-
 				}
 			}
 		}
@@ -39,24 +69,24 @@ func countActiveNeighbors(nodes map[string]struct{}, x int, y int, z int, w int)
 	return count
 }
 
-func simulateCycle(nodes map[string]struct{}, dims Dimensions) (map[string]struct{}, Dimensions) {
-	newNodes := make(map[string]struct{}, 0)
-	newDims := Dimensions{0, 0, 0, 0, 0, 0, 0, 0}
-	for x := dims.minX - 1; x <= dims.maxX+1; x++ {
-		for y := dims.minY - 1; y <= dims.maxY+1; y++ {
-			for z := dims.minZ - 1; z <= dims.maxZ+1; z++ {
-				for w := dims.minW - 1; w <= dims.maxW+1; w++ {
-					activeNeighbors := countActiveNeighbors(nodes, x, y, z, w)
-					nodestr := fmt.Sprintf("%d,%d,%d,%d", x, y, z, w)
-					if _, exists := nodes[nodestr]; exists {
+func simulateCycle(nodes *Nodes) *Nodes {
+	newNodes := newNodes()
+
+	var coords Coordinates
+	for coords.x = nodes.dims.min.x - 1; coords.x <= nodes.dims.max.x+1; coords.x++ {
+		for coords.y = nodes.dims.min.y - 1; coords.y <= nodes.dims.max.y+1; coords.y++ {
+			for coords.z = nodes.dims.min.z - 1; coords.z <= nodes.dims.max.z+1; coords.z++ {
+				for coords.w = nodes.dims.min.w - 1; coords.w <= nodes.dims.max.w+1; coords.w++ {
+					activeNeighbors := countActiveNeighbors(nodes, coords)
+					if nodes.exists(coords) {
 						// active
 						if activeNeighbors == 2 || activeNeighbors == 3 {
-							addNode(newNodes, &newDims, x, y, z, w)
+							newNodes.addNode(coords)
 						}
 					} else {
 						// inactive
 						if activeNeighbors == 3 {
-							addNode(newNodes, &newDims, x, y, z, w)
+							newNodes.addNode(coords)
 						}
 					}
 				}
@@ -64,7 +94,7 @@ func simulateCycle(nodes map[string]struct{}, dims Dimensions) (map[string]struc
 		}
 	}
 
-	return newNodes, newDims
+	return newNodes
 }
 
 func minInt(n1 int, n2 int) int {
@@ -81,22 +111,8 @@ func maxInt(n1 int, n2 int) int {
 	return n2
 }
 
-func addNode(nodes map[string]struct{}, dims *Dimensions, x int, y int, z int, w int) {
-	nodeCoords := fmt.Sprintf("%d,%d,%d,%d", x, y, z, w)
-	nodes[nodeCoords] = struct{}{}
-	dims.minX = minInt(x, dims.minX)
-	dims.minY = minInt(y, dims.minY)
-	dims.minZ = minInt(z, dims.minZ)
-	dims.minW = minInt(w, dims.minW)
-	dims.maxX = maxInt(x, dims.maxX)
-	dims.maxY = maxInt(y, dims.maxY)
-	dims.maxZ = maxInt(z, dims.maxZ)
-	dims.maxW = maxInt(w, dims.maxW)
-}
-
 func main() {
-	dims := Dimensions{0, 0, 0, 0, 0, 0, 0, 0}
-	nodes := make(map[string]struct{}, 0)
+	nodes := newNodes()
 	b, _ := ioutil.ReadFile("../input.txt")
 	lines := strings.Split(string(b), "\n")
 	for lineIdx, line := range lines {
@@ -105,14 +121,14 @@ func main() {
 		}
 		for nodeIdx, node := range line {
 			if node == '#' {
-				addNode(nodes, &dims, nodeIdx, lineIdx, 0, 0)
+				nodes.addNode(Coordinates{nodeIdx, lineIdx, 0, 0})
 			}
 		}
 	}
 
 	for i := 0; i < 6; i++ {
-		nodes, dims = simulateCycle(nodes, dims)
+		nodes = simulateCycle(nodes)
 	}
 
-	fmt.Println(len(nodes))
+	fmt.Println(len(nodes.nodes))
 }
