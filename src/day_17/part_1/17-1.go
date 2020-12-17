@@ -31,7 +31,7 @@ func (n *Nodes) exists(coords Coordinates) bool {
 }
 
 func newNodes() *Nodes {
-	n := Nodes{Dimensions{Coordinates{0, 0, 0}, Coordinates{0, 0, 0}}, make(map[Coordinates]Empty, 0)}
+	n := Nodes{nodes: make(map[Coordinates]Empty, 0)}
 	return &n
 }
 
