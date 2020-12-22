@@ -42,7 +42,7 @@ func playGame(cardsP1 *list.List, cardsP2 *list.List) (int, *list.List, *list.Li
 	for cardsP1.Len() > 0 && cardsP2.Len() > 0 {
 		currentP1 := cardsP1.Front()
 		currentP2 := cardsP2.Front()
-		if cardsP1.Front().Value.(int) <= cardsP1.Len()-1 && currentP2.Value.(int) <= cardsP2.Len()-1 {
+		if currentP1.Value.(int) <= cardsP1.Len()-1 && currentP2.Value.(int) <= cardsP2.Len()-1 {
 			newDeckP1 := copyCards(currentP1.Next(), currentP1.Value.(int))
 			newDeckP2 := copyCards(currentP2.Next(), currentP2.Value.(int))
 			winner, _, _ := playGame(newDeckP1, newDeckP2)
